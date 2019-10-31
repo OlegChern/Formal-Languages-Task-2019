@@ -1,6 +1,7 @@
 # Formal-Languages-Task-2019
 Генератор контекстно-зависимой грамматики по линейно-ограниченному автомату: src/grammar/cs_grammar_generator.py
 
+```
 Использование: CS Grammar Generator [-h] [-a AUTOMATON_PATH] [-g [GRAMMAR_PATH]]
 
 optional arguments:
@@ -11,6 +12,7 @@ optional arguments:
 
   -g [GRAMMAR_PATH], --grammar_path [GRAMMAR_PATH]
                         путь для сохранения грамматики
+```
 
 Файл с LBA: resources/grammars/lba.txt
 
@@ -18,6 +20,7 @@ optional arguments:
 
 Генератор свободной грамматики по машине Тьюринга: src/grammar/free_grammar_generator.py
 
+```
 Использование: Free grammar Generator [-h] [-a AUTOMATON_PATH] [-g [GRAMMAR_PATH]]
 
 optional arguments:
@@ -28,6 +31,7 @@ optional arguments:
 
   -g [GRAMMAR_PATH], --grammar_path [GRAMMAR_PATH]
                         путь для сохранения грамматики
+   ```
 
 Файл с МТ: resources/grammars/mt.txt
 
@@ -35,6 +39,7 @@ optional arguments:
 
 Генератор простых чисел по грамматике: src/number_generator/prime_generator.py
 
+```
 Использование: Prime Numbers Generator [-h] [-p GRAMMAR_PATH] [-t GRAMMAR_TYPE]
                                [-n [N]]
 optional arguments:
@@ -47,7 +52,7 @@ optional arguments:
                         тип грамматики (cs либо f)
 
   -n [N]                количество выводимых чисел
-
+```
 
 
 
