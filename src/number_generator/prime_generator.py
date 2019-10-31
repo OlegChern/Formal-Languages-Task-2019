@@ -62,7 +62,8 @@ def main():
     parser = argparse.ArgumentParser("Prime Numbers Generator")
     parser.add_argument("-p", "--grammar_path", help="Specifies where to save generated grammar",
                         type=str)
-    parser.add_argument("-t", "--grammar_type", help="Type of a given grammar (cs/f)")
+    parser.add_argument("-t", "--grammar_type", help="Type of a given grammar (cs/f)", type=str)
+    parser.add_argument("-n", help="Amount of required numbers", nargs="?", default=10, type=int)
     args = parser.parse_args()
 
     if args.grammar_type == "f":
@@ -72,7 +73,7 @@ def main():
         rules, sigma = read_free_grammar(args.grammar_path)
         gen = generator_for_cs_grammar(rules, 'A1', sigma)
 
-    for i in range(20):
+    for i in range(args.n):
         print(len(gen.__next__()))
 
 
