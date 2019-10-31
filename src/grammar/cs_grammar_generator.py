@@ -1,7 +1,7 @@
-from itertools import product
-from collections import deque
-from sys import path
+import argparse
 import re
+from collections import deque
+from itertools import product
 
 
 def parse_automaton(file):
@@ -268,14 +268,17 @@ def save_grammar(dest_file, rules, sigma):
 
 
 def main():
-    automata_folder = '../../resources/automata/'
-    resource_folder = '../../resources/grammars/'
+    parser = argparse.ArgumentParser("cs_grammar_generator")
+    parser.add_argument("--automaton_path", help="Path to lba file", type=str)
+    parser.add_argument("--grammar_path", help="Specifies where to save generated grammar",
+                        type=str, nargs='?', default="resources/grammars/cs_grammar.txt")
+    args = parser.parse_args()
 
-    sigma, gamma, delta, init_state, accept_state = parse_automaton(automata_folder + 'lba.txt')
+    sigma, gamma, delta, init_state, accept_state = parse_automaton(args.automaton_path)
     rules, init_symbol = build_cs_grammar(sigma, gamma, delta, init_state, accept_state)
 
     rules = optimize_grammar(rules, init_symbol, sigma)
-    save_grammar(resource_folder + 'cs-grammar.txt', rules, sigma)
+    save_grammar(args.grammar_path, rules, sigma)
 
 
 if __name__ == '__main__':
