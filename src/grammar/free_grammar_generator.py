@@ -1,5 +1,7 @@
-from src.grammar.cs_grammar_generator import parse_automaton
+import argparse
 from itertools import product
+
+from cs_grammar_generator import parse_automaton
 
 
 def generate_rules(sigma, gamma, delta, init_state, accept_state):
@@ -84,16 +86,19 @@ def optimize_grammar(rules):
 
 
 def main():
-    automata_folder = '../../resources/automata/'
-    resource_folder = '../../resources/grammars/'
+    parser = argparse.ArgumentParser("free_grammar_generator")
+    parser.add_argument("--automaton_path", help="Path to lba file", type=str)
+    parser.add_argument("--grammar_path", help="Specifies where to save generated grammar",
+                        type=str, nargs='?', default="resources/grammars/free-grammar.txt")
+    args = parser.parse_args()
 
-    sigma, gamma, delta, init_state, accept_state = parse_automaton(automata_folder + 'mt.txt')
+    sigma, gamma, delta, init_state, accept_state = parse_automaton(args.automaton_path)
     gamma += sigma
 
     rules = generate_rules(sigma, gamma, delta, init_state, accept_state)
     rules = optimize_grammar(rules)
 
-    save_grammar(resource_folder + 'free-grammar.txt', rules, sigma)
+    save_grammar(args.grammar_path, rules, sigma)
 
 
 if __name__ == '__main__':
