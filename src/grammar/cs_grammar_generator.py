@@ -96,17 +96,17 @@ def movement_config_left(sigma, gamma, delta, accept_state):
                     if y == '$' and x == '$' and d == '>':
                         for g in gamma:
                             rules.append(
-                                ('[{q},$,{X},{a}]'.format(q=q, X=g, a=a), '[$,{p},{X},{a}]'.format(p=p, X=g, a=a)))
+                                (f'[{q},$,{g},{a}]', f'[$,{p},{g},{a}]'))
                     elif d == '<':
-                        rules.append(('[$,{q},{X},{a}]'.format(q=q, X=x, a=a), '[{p},$,{Y},{a}]'.format(p=p, Y=y, a=a)))
+                        rules.append((f'[$,{q},{x},{a}]', f'[{p},$,{y},{a}]'))
                     elif d == '>':
                         for z, b in product(gamma, sigma):
-                            l_rule = '[$,{q},{X},{a}][{Z},{b}]'.format(q=q, X=x, a=a, Z=z, b=b)
-                            r_rule = '[$,{Y},{a}][{p},{Z},{b}]'.format(p=p, Y=y, a=a, Z=z, b=b)
+                            l_rule = f'[$,{q},{x},{a}][{z},{b}]'
+                            r_rule = f'[$,{y},{a}][{p},{z},{b}]'
                             rules.append((l_rule, r_rule))
 
-                            l_rule = '[$,{q},{X},{a}][{Z},{b},#]'.format(q=q, X=x, a=a, Z=z, b=b)
-                            r_rule = '[$,{Y},{a}][{p},{Z},{b},#]'.format(p=p, Y=y, a=a, Z=z, b=b)
+                            l_rule = f'[$,{q},{x},{a}][{z},{b},#]'
+                            r_rule = f'[$,{y},{a}][{p},{z},{b},#]'
                             rules.append((l_rule, r_rule))
     return rules
 
