@@ -88,8 +88,8 @@ def optimize_grammar(rules, init_symbol_1, init_symbol_2):
 
 def main():
     parser = argparse.ArgumentParser("Free grammar Generator")
-    parser.add_argument("--automaton_path", help="Path to lba file", type=str)
-    parser.add_argument("--grammar_path", help="Specifies where to save generated grammar",
+    parser.add_argument("-a", "--automaton_path", help="Path to lba file", type=str)
+    parser.add_argument("-g", "--grammar_path", help="Specifies where to save generated grammar",
                         type=str, nargs='?', default="resources/grammars/free-grammar.txt")
     args = parser.parse_args()
 
