@@ -2,7 +2,7 @@ import argparse
 from collections import deque
 
 
-def generator_for_free_grammar(rules, init_symbol_1, init_symbol_2, sigma):
+def word_generator(rules, init_symbol_1, init_symbol_2, sigma):
     q = deque([init_symbol_1])
     st = set()
     while len(q):
@@ -19,24 +19,6 @@ def generator_for_free_grammar(rules, init_symbol_1, init_symbol_2, sigma):
                             q.append(new_word)
                         else:
                             q.appendleft(new_word)
-
-
-def generator_for_cs_grammar(rules_list, initial_symbol, sigma):
-    st = set()
-    queue = deque()
-    queue.append(initial_symbol)
-
-    while len(queue):
-        word = queue.popleft()
-        for left, right in rules_list:
-            if left in word:
-                tmp = word.replace(left, right)
-                if tmp not in st:
-                    queue.append(tmp)
-                    st.add(tmp)
-
-        if all(c in sigma for c in word):
-            yield word
 
 
 def read_cs_grammar(file):
@@ -68,10 +50,10 @@ def main():
 
     if args.grammar_type == "f":
         rules, sigma = read_free_grammar(args.grammar_path)
-        gen = generator_for_free_grammar(rules, 'A1', 'A2', sigma)
+        gen = word_generator(rules, 'A1', 'A2', sigma)
     elif args.grammar_type == "cs":
         rules, sigma = read_free_grammar(args.grammar_path)
-        gen = generator_for_cs_grammar(rules, 'A1', sigma)
+        gen = word_generator(rules, 'A1', 'A2', sigma)
 
     for i in range(args.n):
         print(len(gen.__next__()))
