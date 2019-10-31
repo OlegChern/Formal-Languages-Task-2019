@@ -28,8 +28,8 @@ def parse_automaton(file):
 
 
 # 1 из Мартыненко
-def init_config_single(sigma, init_state):
-    return [('A1', '[{q0},$,{a},{a},#]'.format(q0=init_state, a=a)) for a in sigma]
+def init_config_single(sigma, init_state, init_symbol):
+    return [(init_symbol, f'[{init_state},$,{a},{a},#]') for a in sigma]
 
 
 # 2.1 - 2.4 из Мартыненко
@@ -43,21 +43,21 @@ def movement_config_single(sigma, gamma, delta, accept_state):
                     p, y, d = right
                     if y == '$' and x == '$' and d == '>':
                         for g in gamma:
-                            l_rule = '[{q},$,{X},{a},#]'.format(q=q, X=g, a=a)
-                            r_rule = '[$,{p},{X},{a},#]'.format(p=p, X=g, a=a)
+                            l_rule = f'[{q},$,{x},{a},#]'
+                            r_rule = f'[$,{p},{x},{a},#]'
                             rules.append((l_rule, r_rule))
                     elif y == '#' and x == '#' and d == '<':
                         for g in gamma:
-                            l_rule = '[$,{X},{a},{q},#]'.format(q=q, X=g, a=a)
-                            r_rule = '[$,{p},{X},{a},#]'.format(p=p, X=g, a=a)
+                            l_rule = f'[$,{g},{a},{q},#]'
+                            r_rule = f'[$,{p},{g},{a},#]'
                             rules.append((l_rule, r_rule))
                     elif d == '<':
-                        l_rule = '[$,{q},{X},{a},#]'.format(q=q, X=x, a=a)
-                        r_rule = '[{p},$,{Y},{a},#]'.format(p=p, Y=y, a=a)
+                        l_rule = f'[$,{q},{x},{a},#]'
+                        r_rule = f'[{p},$,{y},{a},#]'
                         rules.append((l_rule, r_rule))
                     elif d == '>':
-                        l_rule = '[$,{q},{X},{a},#]'.format(q=q, X=x, a=a)
-                        r_rule = '[$,{Y},{a},{p},#]'.format(p=p, Y=y, a=a)
+                        l_rule = f'[$,{q},{x},{a},#]'
+                        r_rule = f'[$,{y},{a},{p},#]'
                         rules.append((l_rule, r_rule))
 
     return rules
@@ -68,19 +68,19 @@ def restore_word_accept(sigma, gamma, accept_state):
     rules = []
     for a in sigma:
         for g in gamma:
-            rules.append(('[{q},$,{X},{a},#]'.format(q=accept_state, X=g, a=a), a))
-            rules.append(('[$,{q},{X},{a},#]'.format(q=accept_state, X=g, a=a), a))
-            rules.append(('[$,{X},{a},{q},#]'.format(q=accept_state, X=g, a=a), a))
+            rules.append((f'[{accept_state},$,{g},{a},#]', a))
+            rules.append((f'[$,{accept_state},{g},{a},#]', a))
+            rules.append((f'[$,{g},{a},{accept_state},#]', a))
     return rules
 
 
 # 4.1 - 4.3 из Мартыненко
-def init_config_general(sigma, init_state):
+def init_config_general(sigma, init_state, init_symbol_1, init_symbol_2):
     rules = []
     for a in sigma:
-        rules.append(('A1', '[{q0},$,{a},{a}]A2'.format(q0=init_state, a=a)))
-        rules.append(('A2', '[{a},{a}]A2'.format(a=a)))
-        rules.append(('A2', '[{a},{a},#]'.format(a=a)))
+        rules.append((init_symbol_1, f'[{init_state},$,{a},{a}]{init_symbol_2}'))
+        rules.append((init_symbol_2, f'[{a},{a}]{init_symbol_2}'))
+        rules.append((init_symbol_2, f'[{a},{a},#]'))
     return rules
 
 
@@ -123,20 +123,20 @@ def movement_config_center(sigma, gamma, delta, accept_state):
                     if x in gamma and y in gamma:
                         for z, b in product(gamma, sigma):
                             if d == '>':
-                                l_rule = '[{q},{X},{a}][{Z},{b}]'.format(q=q, X=x, a=a, Z=z, b=b)
-                                r_rule = '[{Y},{a}][{p},{Z},{b}]'.format(Y=y, a=a, p=p, Z=z, b=b)
+                                l_rule = f'[{q},{x},{a}][{z},{b}]'
+                                r_rule = f'[{y},{a}][{p},{z},{b}]'
                                 rules.append((l_rule, r_rule))
 
-                                l_rule = '[{q},{X},{a}][{Z},{b},#]'.format(q=q, X=x, a=a, Z=z, b=b)
-                                r_rule = '[{Y},{a}][{p},{Z},{b},#]'.format(Y=y, a=a, p=p, Z=z, b=b)
+                                l_rule = f'[{q},{x},{a}][{z},{b},#]'
+                                r_rule = f'[{y},{a}][{p},{z},{b},#]'
                                 rules.append((l_rule, r_rule))
                             else:
-                                l_rule = '[{Z},{b}][{q},{X},{a}]'.format(q=q, X=x, a=a, Z=z, b=b)
-                                r_rule = '[{p},{Z},{b}][{Y},{a}]'.format(Y=y, a=a, p=p, Z=z, b=b)
+                                l_rule = f'[{z},{b}][{q},{x},{a}]'
+                                r_rule = f'[{p},{z},{b}][{y},{a}]'
                                 rules.append((l_rule, r_rule))
 
-                                l_rule = '[$,{Z},{b}][{q},{X},{a}]'.format(q=q, X=x, a=a, Z=z, b=b)
-                                r_rule = '[$,{p},{Z},{b}][{Y},{a}]'.format(Y=y, a=a, p=p, Z=z, b=b)
+                                l_rule = f'[$,{z},{b}][{q},{x},{a}]'
+                                r_rule = f'[$,{p},{z},{b}][{y},{a}]'
                                 rules.append((l_rule, r_rule))
 
     return rules
@@ -154,18 +154,18 @@ def movement_config_right(sigma, gamma, delta, accept_state):
                     if y == '#' and x == '#' and d == '<':
                         for g in gamma:
                             rules.append(
-                                ('[{X},{a},{q},#]'.format(q=q, X=g, a=a), '[{p},{X},{a},#]'.format(p=p, X=g, a=a)))
+                                (f'[{g},{a},{q},#]', f'[{p},{g},{a},#]'))
                     elif d == '>':
                         rules.append(
-                            ('[{q},{X},{a},#]'.format(q=q, X=x, a=a), '[{Y},{a},{p},#]'.format(p=p, Y=y, a=a)))
+                            (f'[{q},{x},{a},#]', f'[{y},{a},{p},#]'))
                     elif d == '<':
                         for z, b in product(gamma, sigma):
-                            l_rule = '[{Z},{b}][{q},{X},{a},#]'.format(q=q, X=x, a=a, Z=z, b=b)
-                            r_rule = '[{p},{Z},{b}][{Y},{a},#]'.format(p=p, Y=y, a=a, Z=z, b=b)
+                            l_rule = f'[{z},{b}][{q},{x},{a},#]'
+                            r_rule = f'[{p},{z},{b}][{y},{a},#]'
                             rules.append((l_rule, r_rule))
 
-                            l_rule = '[$,{Z},{b}][{q},{X},{a},#]'.format(q=q, X=x, a=a, Z=z, b=b)
-                            r_rule = '[$,{p},{Z},{b}][{Y},{a},#]'.format(p=p, Y=y, a=a, Z=z, b=b)
+                            l_rule = f'[$,{z},{b}][{q},{x},{a},#]'
+                            r_rule = f'[$,{p},{z},{b}][{y},{a},#]'
                             rules.append((l_rule, r_rule))
     return rules
 
@@ -174,11 +174,11 @@ def movement_config_right(sigma, gamma, delta, accept_state):
 def restore_word_accepted(sigma, gamma, accept_state):
     rules = []
     for x, a in product(gamma, sigma):
-        rules.append(('[{q},$,{X},{a}]'.format(q=accept_state, X=x, a=a), a))
-        rules.append(('[$,{q},{X},{a}]'.format(q=accept_state, X=x, a=a), a))
-        rules.append(('[{q},{X},{a}]'.format(q=accept_state, X=x, a=a), a))
-        rules.append(('[{q},{X},{a},#]'.format(q=accept_state, X=x, a=a), a))
-        rules.append(('[{X},{a},{q},#]'.format(q=accept_state, X=x, a=a), a))
+        rules.append((f'[{accept_state},$,{x},{a}]', a))
+        rules.append((f'[$,{accept_state},{x},{a}]', a))
+        rules.append((f'[{accept_state},{x},{a}]', a))
+        rules.append((f'[{accept_state},{x},{a},#]', a))
+        rules.append((f'[{x},{a},{accept_state},#]', a))
     return rules
 
 
@@ -186,28 +186,29 @@ def restore_word_accepted(sigma, gamma, accept_state):
 def restore_word_general(sigma, gamma):
     rules = []
     for x, a, b in product(gamma, sigma, sigma):
-        rules.append(('{a}[{X},{b}]'.format(a=a, X=x, b=b), '{a}{b}'.format(a=a, b=b)))
-        rules.append(('{a}[{X},{b},#]'.format(a=a, X=x, b=b), '{a}{b}'.format(a=a, b=b)))
-        rules.append(('[{X},{a}]{b}'.format(a=a, X=x, b=b), '{a}{b}'.format(a=a, b=b)))
-        rules.append(('[$,{X},{a}]{b}'.format(a=a, X=x, b=b), '{a}{b}'.format(a=a, b=b)))
+        rules.append((f'{a}[{x},{b}]', f'{a}{b}'))
+        rules.append((f'{a}[{x},{b},#]', f'{a}{b}'))
+        rules.append((f'[{x},{a}]{b}', f'{a}{b}'))
+        rules.append((f'[$,{x},{a}]{b}', f'{a}{b}'))
     return rules
 
 
 def build_cs_grammar(sigma, gamma, delta, init_state, accept_state):
     gamma += sigma
+    init_symbol_1 = 'A1'
+    init_symbol_2 = 'A2'
 
-    rules = init_config_single(sigma, init_state)
+    rules = init_config_single(sigma, init_state, init_symbol_1)
     rules += movement_config_single(sigma, gamma, delta, accept_state)
     rules += restore_word_accept(sigma, gamma, accept_state)
-    rules += init_config_general(sigma, init_state)
+    rules += init_config_general(sigma, init_state, init_symbol_1, init_symbol_2)
     rules += movement_config_left(sigma, gamma, delta, accept_state)
     rules += movement_config_center(sigma, gamma, delta, accept_state)
     rules += movement_config_right(sigma, gamma, delta, accept_state)
     rules += restore_word_accepted(sigma, gamma, accept_state)
     rules += restore_word_general(sigma, gamma)
 
-    init_symbol = 'A1'
-    return rules, init_symbol
+    return rules, init_symbol_1
 
 
 def weak_optimize_grammar(rules):
@@ -248,8 +249,6 @@ def deep_optimize_grammar(rules, initial_symbol, sigma, steps):
                 continue
             else:
                 return list(used)
-
-    raise Exception("Language is infinite!")
 
 
 def optimize_grammar(rules, init_symbol, sigma):

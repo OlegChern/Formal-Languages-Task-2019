@@ -3,10 +3,13 @@ from itertools import product
 
 
 def generate_rules(sigma, gamma, delta, init_state, accept_state):
+    init_symbol_1 = 'A1'
+    init_symbol_2 = 'A2'
+
     rules = []
-    rules += [('A1', '[,_]{q0}A2[,_][,_]'.format(q0=init_state))]
-    rules += [('A2', '[{a},{a}]A2'.format(a=a)) for a in sigma]  # 2 из Мартыненко
-    rules += [('A2', '')]
+    rules += [(f'{init_symbol_1}', f'[,_]{init_state}{init_symbol_2}[,_][,_]')]
+    rules += [(f'{init_symbol_2}', f'[{a},{a}]{init_symbol_2}') for a in sigma]  # 2 из Мартыненко
+    rules += [(f'{init_symbol_2}', '')]
 
     gamma = gamma
     t_sigma = sigma + ['']
@@ -16,26 +19,26 @@ def generate_rules(sigma, gamma, delta, init_state, accept_state):
             for right in rights:
                 p, d, m = right
                 if m == '>':  # 6
-                    l_rule = '{q}[{a},{C}]'.format(q=q, a=a, C=c)
-                    r_rule = '[{a},{D}]{p}'.format(a=a, D=d, p=p)
+                    l_rule = f'{q}[{a},{c}]'
+                    r_rule = f'[{a},{d}]{p}'
                     rules.append((l_rule, r_rule))
                 else:  # 7
                     for b, e in product(t_sigma, gamma):
-                        l_rule = '[{b},{E}]{q}[{a},{C}]'.format(b=b, E=e, q=q, a=a, C=c)
-                        r_rule = '{p}[{b},{E}][{a},{D}]'.format(p=p, a=a, D=d, b=b, E=e)
+                        l_rule = f'[{b},{e}]{q}[{a},{c}]'
+                        r_rule = f'{p}[{b},{e}][{a},{d}]'
                         rules.append((l_rule, r_rule))
 
     for a, c in product(sigma, gamma):  # 8
-        rules.append(('[{a},{C}]{q}'.format(a=a, C=c, q=accept_state), '{q}{a}'.format(q=accept_state, a=a)))
-        rules.append(('{q}[{a},{C}]'.format(q=accept_state, a=a, C=c), '{q}{a}{q}'.format(q=accept_state, a=a)))
+        rules.append((f'[{a},{c}]{accept_state}', f'{accept_state}{a}'))
+        rules.append((f'{accept_state}[{a},{c}]', f'{accept_state}{a}{accept_state}'))
 
     for c in gamma:
-        rules.append(('[,{C}]{q}'.format(C=c, q=accept_state), accept_state))
-        rules.append(('{q}[,{C}]'.format(C=c, q=accept_state), accept_state))
+        rules.append((f'[,{c}]{accept_state}', accept_state))
+        rules.append((f'{accept_state}[,{c}]', accept_state))
 
-    rules.append(('{q}'.format(q=accept_state), ''))
+    rules.append((accept_state, ''))
 
-    return rules
+    return rules, init_symbol_1, init_symbol_2
 
 
 def save_grammar(dest_file, rules, sigma):
@@ -45,22 +48,20 @@ def save_grammar(dest_file, rules, sigma):
             s += a + ' '
         s += '\n'
         grammar.write(s)
-        lines = ["{l} -> {r}\n".format(l=left, r=right) for left, right in rules]
+        lines = [f"{left} -> {right}\n" for left, right in rules]
         grammar.writelines(lines)
 
 
-def optimize_grammar(rules):
-    size = 60
-    stg1 = 3
-    active = set()
-    tmp = set()
-    q = ["A1"]
-    stage2 = []
-    while len(q):
+def optimize_grammar(rules, init_symbol_1, init_symbol_2):
+    size, stg1 = 60, 3
+    active, tmp = set(), set()
+    q, stage2 = [init_symbol_1], []
+
+    while q:
         word = q.pop(0)
         if word not in tmp:
             tmp.add(word)
-            if word not in ["A1", "A2"]:
+            if word not in [init_symbol_1, init_symbol_2]:
                 stage2.append(word)
             for left, right in rules[:stg1]:
                 if left in word:
@@ -90,8 +91,8 @@ def main():
     sigma, gamma, delta, init_state, accept_state = parse_automaton(automata_folder + 'mt.txt')
     gamma += sigma
 
-    rules = generate_rules(sigma, gamma, delta, init_state, accept_state)
-    rules = optimize_grammar(rules)
+    rules, init_symbol_1, init_symbol_2 = generate_rules(sigma, gamma, delta, init_state, accept_state)
+    rules = optimize_grammar(rules, init_symbol_1, init_symbol_2)
 
     save_grammar(resource_folder + 'free-grammar.txt', rules, sigma)
 

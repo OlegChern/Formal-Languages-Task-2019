@@ -1,8 +1,8 @@
 from collections import deque
 
 
-def generator_for_free_grammar(rules, init_symbol, sigma):
-    q = deque([init_symbol])
+def generator_for_free_grammar(rules, init_symbol_1, init_symbol_2, sigma):
+    q = deque([init_symbol_1])
     st = set()
     while len(q):
         word = q.popleft()
@@ -14,15 +14,13 @@ def generator_for_free_grammar(rules, init_symbol, sigma):
                 for left, right in rules:
                     if left in word:
                         new_word = word.replace(left, right)
-                        if any(S in new_word for S in ["A1", "A2"]):
+                        if any(S in new_word for S in [init_symbol_1, init_symbol_2]):
                             q.append(new_word)
                         else:
                             q.appendleft(new_word)
 
-    raise Exception("Language cannot be finite")
 
-
-def language_generator(rules_list, initial_symbol, sigma):
+def generator_for_cs_grammar(rules_list, initial_symbol, sigma):
     st = set()
     queue = deque()
     queue.append(initial_symbol)
@@ -38,8 +36,6 @@ def language_generator(rules_list, initial_symbol, sigma):
 
         if all(c in sigma for c in word):
             yield word
-
-    raise Exception("Language cannot be finite")
 
 
 def read_cs_grammar(file):
@@ -64,9 +60,9 @@ def read_free_grammar(file):
 def main():
     resource_folder = '../../resources/grammars/'
 
-    # rules, sigma = read_cs_grammar(resource_folder + "cs-grammar.txt")
-    rules, sigma = read_free_grammar(resource_folder + "free-grammar.txt")
-    gen = generator_for_free_grammar(rules, 'A1', sigma)
+    rules, sigma = read_cs_grammar(resource_folder + "cs-grammar.txt")
+    # rules, sigma = read_free_grammar(resource_folder + "free-grammar.txt")
+    gen = generator_for_free_grammar(rules, 'A1','A2', sigma)
 
     for i in range(20):
         print(len(gen.__next__()))
