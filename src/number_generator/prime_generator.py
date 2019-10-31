@@ -1,3 +1,4 @@
+import argparse
 from collections import deque
 
 
@@ -58,11 +59,18 @@ def read_free_grammar(file):
 
 
 def main():
-    resource_folder = '../../resources/grammars/'
+    parser = argparse.ArgumentParser("Prime Numbers Generator")
+    parser.add_argument("-p", "--grammar_path", help="Specifies where to save generated grammar",
+                        type=str)
+    parser.add_argument("-t", "--grammar_type", help="Type of a given grammar (cs/f)")
+    args = parser.parse_args()
 
-    rules, sigma = read_cs_grammar(resource_folder + "cs-grammar.txt")
-    # rules, sigma = read_free_grammar(resource_folder + "free-grammar.txt")
-    gen = generator_for_free_grammar(rules, 'A1','A2', sigma)
+    if args.grammar_type == "f":
+        rules, sigma = read_free_grammar(args.grammar_path)
+        gen = generator_for_free_grammar(rules, 'A1', 'A2', sigma)
+    elif args.grammar_type == "cs":
+        rules, sigma = read_free_grammar(args.grammar_path)
+        gen = generator_for_cs_grammar(rules, 'A1', sigma)
 
     for i in range(20):
         print(len(gen.__next__()))

@@ -267,7 +267,7 @@ def save_grammar(dest_file, rules, sigma):
 
 
 def main():
-    parser = argparse.ArgumentParser("cs_grammar_generator")
+    parser = argparse.ArgumentParser("CS Grammar Generator")
     parser.add_argument("--automaton_path", help="Path to lba file", type=str)
     parser.add_argument("--grammar_path", help="Specifies where to save generated grammar",
                         type=str, nargs='?', default="resources/grammars/cs-grammar.txt")
